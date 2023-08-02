@@ -39,7 +39,7 @@ for new_data in gps_socket:
         if gps_time != "n/a":
             cur.execute(
                 f"""
-                    INSERT INTO gps VALUES
+                    INSERT INTO {DB_TABLE_NAME} VALUES
                     ({ts}, '{gps_time}', {gps_lat}, {gps_lon}, {gps_alt}, {gps_speed})
                 """
             )
