@@ -74,8 +74,14 @@ def gen_gps_monitor(interval):
     # fig.update_layout(mapbox_style="open-street-map")
 
     fig = px.scatter_mapbox(
-        df, lat="lat", lon="lon", zoom=18, mapbox_style="open-street-map", color="alt"
+        df,
+        lat="lat",
+        lon="lon",
+        zoom=18,
+        mapbox_style="open-street-map",
+        color="alt",
     )
+    fig.update_layout(uirevision=True)
 
     return fig
 
