@@ -4,6 +4,7 @@ import time
 
 import dash
 import numpy as np
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from dash import dcc, html
@@ -11,7 +12,7 @@ from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from dotenv import load_dotenv
 
-from api import get_gps_data
+from api import get_gps_data, get_temp_data
 
 DOTENV_FILE = pathlib.Path(__file__).resolve().parent.joinpath(".env").resolve()
 load_dotenv(DOTENV_FILE)
@@ -48,6 +49,18 @@ app.layout = html.Div(
                     interval=int(GRAPH_INTERVAL),
                     n_intervals=0,
                 ),
+                html.Div(
+                    [html.H6("TEMP MONITOR")],
+                ),
+                dcc.Graph(
+                    id="temp-monitor",
+                    figure=dict(
+                        layout=dict(
+                            plot_bgcolor=app_color["graph_bg"],
+                            paper_bgcolor=app_color["graph_bg"],
+                        )
+                    ),
+                ),
             ]
         )
     ]
@@ -80,6 +93,27 @@ def gen_gps_monitor(interval):
         zoom=18,
         mapbox_style="open-street-map",
         color="alt",
+    )
+    fig.update_layout(uirevision=True)
+
+    return fig
+
+
+@app.callback(
+    Output("temp-monitor", "figure"), [Input("gps-monitor-update", "n_intervals")]
+)
+def gen_temp_monitor(interval):
+    end = time.time()
+    df = get_temp_data(end - 60 * 60 * 24, end)
+    df["datetime"] = pd.to_datetime(df["timestamp"], unit="s", utc=True) + pd.Timedelta(
+        "9:00:00"
+    )
+    df["avg"] = df["degC"].rolling(60, center=True).mean()
+
+    fig = px.scatter(
+        df,
+        x="datetime",
+        y=["degC", "avg"],
     )
     fig.update_layout(uirevision=True)
 
