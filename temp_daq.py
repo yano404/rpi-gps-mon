@@ -31,10 +31,10 @@ while True:
     ts = time.time()
     res = subprocess.run(CURL_COMMAND, stdout=subprocess.PIPE)
     retcode = res.returncode
-    retstr = res.stdout.decode()
-    degc, degf = [float(x) for x in prog.findall(retstr)]
 
     if res.returncode == 0:
+        retstr = res.stdout.decode()
+        degc, degf = [float(x) for x in prog.findall(retstr)]
         print(f"{ts} : {degc}, {degf}")
         cur.execute(
             f"""
