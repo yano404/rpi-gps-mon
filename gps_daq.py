@@ -10,13 +10,17 @@ DOTENV_FILE = pathlib.Path(__file__).resolve().parent.joinpath(".env").resolve()
 
 load_dotenv(DOTENV_FILE)
 
-DB_NAME = os.environ.get("DB_NAME")
-DB_TABLE_NAME = os.environ.get("DB_TABLE_NAME")
-DB_FILE = pathlib.Path(__file__).resolve().parent.joinpath(f"db/{DB_NAME}").resolve()
-con = sqlite3.connect(DB_FILE)
+GPS_DB_NAME = os.environ.get("GPS_DB_NAME")
+GPS_DB_TABLE_NAME = os.environ.get("GPS_DB_TABLE_NAME")
+GPS_DB_FILE = (
+    pathlib.Path(__file__).resolve().parent.joinpath(f"db/{GPS_DB_NAME}").resolve()
+)
+con = sqlite3.connect(GPS_DB_FILE)
 cur = con.cursor()
 cur.execute(
-    f"CREATE TABLE IF NOT EXISTS {DB_TABLE_NAME} (timestamp, time, lat, lon, alt, speed)"
+    f"""
+    CREATE TABLE IF NOT EXISTS {GPS_DB_TABLE_NAME}
+    (timestamp, time, lat, lon, alt, speed)"""
 )
 
 GPSD_HOST = os.environ.get("GPSD_HOST")
@@ -39,7 +43,7 @@ for new_data in gps_socket:
         if gps_time != "n/a":
             cur.execute(
                 f"""
-                    INSERT INTO {DB_TABLE_NAME} VALUES
+                    INSERT INTO {GPS_DB_TABLE_NAME} VALUES
                     ({ts}, '{gps_time}', {gps_lat}, {gps_lon}, {gps_alt}, {gps_speed})
                 """
             )
