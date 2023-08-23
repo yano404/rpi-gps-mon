@@ -2,9 +2,9 @@ import os
 import pathlib
 import re
 import sqlite3
-import subprocess
 import time
 
+import requests
 from dotenv import load_dotenv
 
 DOTENV_FILE = pathlib.Path(__file__).resolve().parent.joinpath(".env").resolve()
@@ -22,19 +22,15 @@ cur.execute(f"CREATE TABLE IF NOT EXISTS {TEMP_DB_TABLE_NAME} (timestamp, degC, 
 
 TEMP_HOST = os.environ.get("TEMP_HOST")
 TEMP_URL = f"http://{TEMP_HOST}"
-CURL_COMMAND = ["curl", TEMP_URL, "--http0.9"]
 TEMP_DAQ_INTERVAL = int(os.environ.get("TEMP_DAQ_INTERVAL"))
 
 prog = re.compile("\d+\.\d+")
 
 while True:
     ts = time.time()
-    res = subprocess.run(CURL_COMMAND, stdout=subprocess.PIPE)
-    retcode = res.returncode
-
-    if res.returncode == 0:
-        retstr = res.stdout.decode()
-        degc, degf = [float(x) for x in prog.findall(retstr)]
+    res = requests.get(TEMP_URL)
+    if res.status_code == 200:
+        degc, degf = [float(x) for x in prog.findall(res.text)]
         print(f"{ts} : {degc}, {degf}")
         cur.execute(
             f"""
