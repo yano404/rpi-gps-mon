@@ -11,7 +11,7 @@ rpi-gps-mon
 
 ## Usage
 
-### Getting Started
+### Installation
 
 1. Clone this repository.
    ```sh
@@ -76,4 +76,3 @@ poetry run python app.py
 ```
 
 Visit [localhost:8050](localhost:8050) in your web browser.
-
