@@ -20,7 +20,7 @@ rpi-gps-mon
 2. Install requirements.
    - using pip
      ```
-     python -m pip install pandas plotly dash gps3
+     python3 -m pip install pandas plotly dash gps3 python-dotenv
      ```
    - using [poetry](https://python-poetry.org/)
      ```
